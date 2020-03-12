@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title>index</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--图标-->
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+
+    <!--布局框架-->
+    <link rel="stylesheet" type="text/css" href="css/util.css">
+
+    <!--主要样式-->
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <!-- 防止冲突样式 -->
+    <link rel="stylesheet" type="text/css" href="css/j_custom.css">
+
+    <link href="css/icofont.min.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/custom.js"></script>
+
+
+    <script src="js/include.js"></script>
+
+    <style>
+        #author, #log {
+            width: 45%;
+            margin-right: 15px;
+        }
+
+        #author li, #log li{
+            padding: 10px;
+            margin: 10px 0px;
+            background: #f8f8f8;
+            border-radius: 8px;
+        }
+
+        #author li img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .description {
+            margin-left: 10px;
+            position: absolute;
+            display: inline-grid;
+            line-height: 20px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container" id="header"></div>
+
+<div class="left-nav" id="nav"></div>
+
+<div class="page-content">
+    <blockquote class="layui-elem-quote">欢迎<span id="this_role"></span>：
+        <span class="x-red" id="this_username"></span>！<span id="time"></span>
+    </blockquote>
+    <div class="filed-box">
+        <h2 class="filed-title">数据统计</h2>
+        <div><span class="filed-box-title">车辆申请数</span> <span class="red" id="app_num">0</span></div>
+        <div><span class="filed-box-title">当前可用</span> <span class="red" id="now_allow_count">0</span></div>
+        <div><span class="filed-box-title">已使用</span> <span class="red" id="now_used">0</span></div>
+        <div><span class="filed-box-title">用户总数</span> <span class="red" id="user_count">0</span></div>
+        <div><span class="filed-box-title">维修数量</span> <span class="red" id="not_allow_count">0</span></div>
+    </div>
+    <div class="car-apply-list">
+        <h1 class="text-center filed-title">欢迎使用本系统</h1>
+        <div style="display: flex;">
+            <ul id="author">
+                <h2 class="text-center">作者信息</h2>
+                <li>
+                    <div><img src="/img/czy.jpg">
+                        <div class="description">
+                            <span>陈紫阳</span>
+                            <span>西安邮电大学</span>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <img src="/img/dy.jpg">
+                        <div class="description">
+                            <span>党颖</span>
+                            <span>西安邮电大学</span>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div><img src="/img/jq.jpg">
+                        <div class="description">
+                            <span>贾麒</span>
+                            <span>西安邮电大学</span>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <img src="/img/hch.jpg">
+                        <div class="description">
+                            <span>胡成杭</span>
+                            <span>西安邮电大学</span>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <img src="/img/xzh.jpg">
+                        <div class="description">
+                            <span>夏尊海</span>
+                            <span>西安邮电大学</span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <ul id="log">
+                <h2 class="text-center">里程碑</h2>
+                <li style="color: #0c9463"><i class="icofont-simple-right"></i> 合并代码 <i class="icofont-tick-mark"></i></li>
+                <li style="color: #0c9463"><i class="icofont-simple-right"></i> 添加用户管理功能 <i class="icofont-tick-mark"></i></li>
+                <li style="color: #0c9463"><i class="icofont-simple-right"></i> 添加车辆管理功能 <i class="icofont-tick-mark"></i></li>
+                <li style="color: #0c9463"><i class="icofont-simple-right"></i> 初始化项目 <i class="icofont-tick-mark"></i></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+        $(document).ready(function () {
+            $("#this_role").html(getCookie("role"))
+            $("#this_username").html(getCookie("username"))
+
+            // 工单申请数h
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                contentType: "application/json",
+                url: "http://localhost:10010/zccar/record/asearch",
+                data: JSON.stringify({ "status1": 0, }),
+                success: function (result) {
+                    console.log(result.list)
+                    $("#app_num").html(result.list.length)
+                    $("#now_used").html(result.list.length)
+                }
+
+            })
+
+            // 更新可使用数
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                contentType: "application/json",
+                url: "http://localhost:10010/zccar/vehicle/search",
+                data: JSON.stringify({}),
+                success: function (result) {
+                    $("#now_allow_count").html(result.data.length)
+                }
+            })
+            // 更新用户人数
+            $.ajax({
+                method: "post",
+                dataType: "json",
+                contentType: "application/json",
+                url: "http://localhost:10010/zccar/userbase/search",
+                data: JSON.stringify({}),
+                success: function (result) {
+                    $("#user_count").html(result.data.length)
+                },
+                error: function () {
+                    console.log("失败")
+                }
+            })
+        })
+    </script>
+
+</body>
+
+</html>

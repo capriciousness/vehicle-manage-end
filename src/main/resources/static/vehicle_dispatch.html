@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title>index</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--图标-->
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+
+    <!--布局框架-->
+    <link rel="stylesheet" type="text/css" href="css/util.css">
+
+    <!--主要样式-->
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <!-- 防止冲突样式 -->
+    <link rel="stylesheet" type="text/css" href="css/j_custom.css">
+
+    <link href="css/icofont.min.css" rel="stylesheet">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/include.js"></script>
+    <script>
+        (document).ready(function () {
+            $("#this_role").html(getCookie("role"))
+            $("#this_username").html(getCookie("username"))
+        })
+    </script>
+</head>
+
+<body>
+    <div class="container" id="header"></div>
+
+    <div class="left-nav" id="nav"></div>
+
+    <div class="page-content">
+        <blockquote class="layui-elem-quote">欢迎<span id="this_role"></span>：
+            <span class="x-red" id="this_username"></span>！<span id="time"></span>
+        </blockquote>
+        <h1>车辆派用管理</h1>
+        <div class="carInfo-block">
+            <!-- <span class="add_btn"><i class="icofont-plus-circle" style="padding: 3px 0px;"></i> 添加用户</span> -->
+            <span class="search-btn" id="vehicleDisAll"><i class="icofont-search-user"></i>查看用车记录</span>
+            <span class="search-btn" id="vehicleDispatch"><i class="icofont-search-user"></i>查看待审核记录</span>
+        </div>
+        <div class="user_table">
+            <table id="vehicleTable">
+                <tr>
+                    <td>id</td>
+                    <td>车辆编号</td>
+                    <td>出车时间</td>
+                    <td>还车时间</td>
+                    <td>紧急程度</td>
+                    <td>用车事由</td>
+                    <td>实际出车时间</td>
+                    <td>实际还车时间</td>
+                    <td>是否超时未还</td>
+                    <td>用户名</td>
+                    <td>用车人</td>
+                    <td>审核状态</td>
+                    <td>操作</td>
+                </tr>
+                <!--<tr>-->
+                    <!--<td>-->
+                        <!--<button class="manage-allow" onclick="deltable(this)">处理</button>-->
+                        <!--&lt;!&ndash; <button class="manage-refuge">拒绝</button> &ndash;&gt;-->
+                    <!--</td>-->
+                <!--</tr>-->
+
+            </table>
+        </div>
+    </div>
+    <script src="js/custom.js"></script>
+    <script src="./js/vehicle.js"></script>
+
+    
+</body>
+
+</html>

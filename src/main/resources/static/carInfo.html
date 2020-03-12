@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title>index</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--图标-->
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+
+    <!--布局框架-->
+    <link rel="stylesheet" type="text/css" href="css/util.css">
+
+    <!--主要样式-->
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <!-- 防止冲突样式 -->
+    <link rel="stylesheet" type="text/css" href="css/j_custom.css">
+
+    <link href="css/icofont.min.css" rel="stylesheet">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/include.js"></script>
+</head>
+
+<body>
+<div class="container" id="header"></div>
+
+<div class="left-nav" id="nav"></div>
+
+<div class="page-content">
+    <blockquote class="layui-elem-quote">欢迎<span id="this_role"></span>：
+        <span class="x-red" id="this_username"></span>！<span id="time"></span>
+    </blockquote>
+    <h1>车辆信息</h1>
+    <div class="carInfo-block">
+        <span class="carInfo-del-all-button"><i class="icofont-bin"></i> 批量删除</span>
+        <span class="carInfo-add-button"><i class="icofont-plus-circle" style="padding: 3px 0px;"></i> 增加</span>
+        <!-- <span style="float: right;">共有数据 <span id="total">x</span> 条</span> -->
+    </div>
+    <div class="carInfo-table-container">
+        <table id="carInfo">
+            <tr>
+                <td><input type="checkbox" class="_check-box" name=items id="allAndNotAll" /></td>
+                <!-- <td class="car_id">id</td>
+        <td class="car_number">车辆编号</td> -->
+                <td class="car_plate">车牌号</td>
+                <td class="car_status">车辆可使用状态</td>
+                <td class="car_seat_num">座位数</td>
+                <td>操作</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<!-- 对话框 -->
+<div class="popver-box">
+    <div class="popver-box-head">
+        <span class="popver-box-title"></span>
+        <i id="popver-box-close" class="icofont-close popver-box-close" style="float: right;padding: 4px;"></i>
+    </div>
+    <div class="popver-box-body">
+        <div class="popver-box-body-content"></div>
+        <div class="popver-box-body-btn"><span class="popver-box-close-yes"><i
+                class="icofont-check-alt"></i>确定</span><span class="popver-box-close"><i
+                class="icofont-close-line"></i>取消</span></div>
+    </div>
+</div>
+
+<script src="js/custom.js"></script>
+<script>
+        var isPopverWorking = false
+
+        // 隐藏对话框
+        $(".popver-box-close").click(function () {
+            $(".popver-box").hide()
+            isPopverWorking = false
+        })
+
+        // 统计表格里的数据条目
+        function get_size() {
+            $("#total").text($("#carInfo tr").size() - 1)
+        }
+
+
+        $(document).ready(function () {
+            $("#this_role").html(getCookie("role"))
+            $("#this_username").html(getCookie("username"))
+        })
+
+        // 将车辆状态转化成数字
+        function convertStatus2Nums(status) {
+            if (status == "正常") {
+                return 1
+            } else {
+                return 0
+            }
+        }
+
+        // 将服务器来的数字状态转换成汉字
+        function convertStatus(number) {
+            if (number == 1) {
+                return "正常"
+            } else {
+                return "不可用"
+            }
+        }
+
+        // 添加车辆信息
+        $(".carInfo-add-button").click(function () {
+            if (isPopverWorking) {
+                return 0
+            }
+            // 首先禁止点击 ‘批量删除’ ‘修改信息’ ‘删除’ 按钮的操作
+            isPopverWorking = true
+            var html_content = '\
+            <div style="display: flex;padding-left: 17%;">\
+                <ul style="text-align: right;margin-right: 10px;">\
+                    <li style="margin:5px 0px">车牌号:  </li>\
+                    <li style="margin:5px 0px">车辆状态:  </li>\
+                    <li style="margin:5px 0px">座位数:  </li>\
+                </ul>\
+                <ul>\
+                    <li style="margin:5px 0px"><input name="car_plate" style="width:160px" type="text" placeholder="请输入车牌号"></li>\
+                    <li style="margin:5px 0px"><select style="width:160px"><option value="正常">正常</option><option value="维修">维修</option></select></li>\
+                    <li style="margin:5px 0px"><input name="seat_number" style="width:160px" type="text" placeholder="请输入座位数"></li>\
+                </ul>\
+            </div>'
+            $(".popver-box-body-content").html(html_content)
+            $(".popver-box-title").html("车辆条目增加")     // 设置标题
+            $(".popver-box").show()
+
+            $(".popver-box-close-yes").bind('click', function () {
+                var car_plate = $("input[name='car_plate']").val()  // 车牌号
+                var status = convertStatus2Nums($("select option:selected").text())
+                var seat_number = parseInt($("input[name='seat_number']").val())
+
+                // 向表格中添加这条数据
+
+                var tabel_html = '<tr>\
+                                        <td><input type="checkbox" class="check-box" name=items id="003"/></td>\
+                                        <td class="car_plate">'+ car_plate + '</td>\
+                                        <td class="car_status">'+ convertStatus(parseInt(status)) + '</td>\
+                                        <td class="car_seat_num">'+ seat_number + '</td>\
+                                        <td><span class="carInfo-modify">修改信息</span><span class="carInfo-del">删除</span></td>\
+                                    </tr>'
+
+                // 发起ajax请求 添加到数据库
+                var parm = { "car": { "vehicleNumber": car_plate, "status": status, "seats": seat_number } }
+                console.log(parm)
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json",
+                    url: "http://localhost:10010/zccar/vehicle/insertinfo",
+                    data: JSON.stringify(parm),
+                    success: function () {
+                        console.log("ok")
+                    },
+                    error: function () {
+                        console.log("err")
+                    }
+                })
+                $(".popver-box").hide()
+
+                // 更新页面
+                $("#carInfo").append(tabel_html)
+
+                // 更新页面计数器
+                get_size()
+                $(this).unbind('click')     // 取消绑定的 click 事件， 由于使用类名选择器，点击批量“删除按钮” 会插入 undefined 数据
+                isPopverWorking = false
+            })
+            console.info('已经绑定click事件');
+
+        })
+
+        // 单行信息删除
+        $(document).on('click', ".carInfo-del", function () {
+            if (isPopverWorking) {
+                return 0
+            }
+
+            var parm = { "carNum": $(this).parents("tr").children("td.car_plate").text() }
+
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                contentType: "application/json",
+                url: "http://localhost:10010/zccar/vehicle/delinfo",
+                data: JSON.stringify(parm),
+                success: function (result) {
+                    $(this).parents('tr').remove()
+                },
+                error: function () {
+                    console.log("删除失败")
+
+                }
+            })
+            $(this).parents('tr').remove()
+            // 更新计数器
+            get_size()
+        })
+
+        // 修改车辆信息
+        $(document).on('click', ".carInfo-modify", function () {
+            if (isPopverWorking) {
+                return 0
+            }
+            isPopverWorking = true
+            var _this = $(this)  // 暂存选择器，更新表格时需要用到
+            // 弹出修改框
+            var plate = $(this).parents("tr").children("td.car_plate").html()    // 车牌号
+            var status = $(this).parents("tr").children("td.car_status").html()    // 车辆状态
+
+            // 根据状态切换状态下拉列表的默认项
+
+            var input_html = '<select id="_status" style="width:160px"><option value="正常">正常</option><option value="维修">维修</option></select>'
+
+            var seat_num = $(this).parents("tr").children("td.car_seat_num").html()    // 车辆座位数
+
+            var html_content = '\
+            <div style="display: flex;padding-left: 17%;">\
+                <ul style="text-align: right;margin-right: 10px;">\
+                    <li style="margin:5px 0px">车牌号:  </li>\
+                    <li style="margin:5px 0px">车辆状态:  </li>\
+                    <li style="margin:5px 0px">座位数:  </li>\
+                </ul>\
+                <ul>\
+                    <li style="margin:5px 0px"><input id="_plate" name="car_plate" style="width:160px" type="text" placeholder="请输入车牌号" readonly="readonly" value='+ plate + '></li>\
+                    <li style="margin:5px 0px">'+ input_html + '</li>\
+                    <li style="margin:5px 0px"><input id="_seat_num" name="seat_number" style="width:160px" type="text" placeholder="请输入座位数" value='+ seat_num + '></li>\
+                </ul>\
+            </div>'
+            $(".popver-box-body-content").html(html_content)
+            $(".popver-box-title").html("修改车辆信息")     // 设置标题
+            $(".popver-box").show()
+
+            // 信息弹窗显示完毕 下来处理点击确定事件
+            // 获取所有信息
+            $("span.popver-box-close-yes").bind('click', function () {
+                var plate = $(this).parents("div.popver-box-body-btn").prev().children().find("#_plate")
+                var status = $(this).parents("div.popver-box-body-btn").prev().children().find("#_status").find('option:selected')
+                var seat_num = $(this).parents("div.popver-box-body-btn").prev().children().find("#_seat_num")
+                console.log(plate.val(), convertStatus2Nums(status.val()), parseInt(seat_num.val()))
+                // console.log(status.val())
+
+                // 传递信息到后台
+                var parm = { "car": { "vehicleNumber": plate.val(), "status": convertStatus2Nums(status.val()), "seats": parseInt(seat_num.val()) } }
+                $.ajax({
+                    method: "post",
+                    dataType: "json",
+                    contentType: "application/json",
+                    url: "http://localhost:10010/zccar/vehicle/change",
+                    data: JSON.stringify(parm),
+                    success: function () {
+                        console.log("修改成功")
+                    },
+                    error: function () {
+                        console.log("修改失败")
+                    }
+                })
+
+                // 将修改后的值更新到表格
+                if (convertStatus2Nums(status.val()) == 0) {  // 修改了状态 表示不可用， 删除这行表格
+                    $(_this).parents('tr').remove()
+
+                } else {
+                    $(_this).parents('tr').find("td.car_status").text(status.val())
+                    $(_this).parents('tr').find("td.car_seat_num").text(seat_num.val())
+                }
+
+                $(".popver-box").hide()
+
+                $(this).unbind("click")     // 解除绑定
+                isPopverWorking = false
+            })
+        })
+
+
+        // 设置按钮弹出对话框===>批量删除
+        $(".carInfo-del-all-button").click(function () {
+            if (isPopverWorking) {
+                return 0
+            }
+            isPopverWorking = true
+            $(".popver-box-title").html("info")
+            $(".popver-box-body-content").html("确定要删除吗？")
+            $(".popver-box").show()
+            var events = $._data($("span.popver-box-close-yes")[0], "events");
+            if (!(events && events["click"])) {
+                $(".popver-box-close-yes").click(function () {      //  处理确切按钮事件
+                    // 获取所有选择的表格行
+                    // $(".check-box")
+                    $('input.check-box[name="items"]').filter(':checked').each(function () {
+                        var parm = { "carNum": $(this).parents("tr").children("td.car_plate").text() }
+
+                        $.ajax({
+                            type: "post",
+                            dataType: "json",
+                            contentType: "application/json",
+                            url: "http://localhost:10010/zccar/vehicle/delinfo",
+                            data: JSON.stringify(parm),
+                            success: function (result) {
+                                $(this).parents('tr').remove()
+                            },
+                            error: function () {
+                                console.log("删除失败")
+
+                            }
+                        })
+                        $(this).parents('tr').remove()
+                    })
+
+                    // 隐藏对话框
+                    $(".popver-box").hide()
+                    // 更新页面计数器
+                    get_size()
+                    // 解除事件绑定
+                    $(this).unbind('click')
+                    isPopverWorking = false
+                })
+            }
+        })
+
+
+        // 实现全选和反选
+        $("#allAndNotAll").click(function () {
+            if (this.checked) {
+                $("input[name='items']:checkbox").each(function () {
+                    $(this).prop('checked', true)
+                });
+            } else {
+                $("input[name='items']:checkbox").each(function () {
+                    $(this).prop('checked', false)
+                });
+            }
+        });
+        //获取被选中的id
+        var ids = [];
+        $('#allAndNotAll').click(function () {
+            if (!this.checked) {
+                ids = []
+            }
+            $("input[name='items']:checked").each(function () {
+                ids.push($(this).attr("id"));
+            });
+
+            var delIds = ids.join(",");
+            console.log(delIds);
+        });
+
+        $(document).ready(function () {
+            var parm = {}
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                contentType: "application/json",
+                url: "http://localhost:10010/zccar/vehicle/search",
+                data: JSON.stringify(parm),
+                success: function (result) {
+                    console.log(result)
+                    var html = ''
+                    $.each(result.data, function (index, content) {
+                        html = '<tr>\
+                                    <td><input type="checkbox" class="check-box" name=items id='+ index + ' /></td>\
+                                    <td class="car_plate">'+ content.vehicleNumber + '</td>\
+                                    <td class="car_status">'+ convertStatus(content.status) + '</td>\
+                                    <td class="car_seat_num">'+ content.seats + '</td>\
+                                    <td><span class="carInfo-modify">修改信息</span><span class="carInfo-del">删除</span></td>\
+                                </tr>'
+                        $("#carInfo").append(html)
+                    });
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>

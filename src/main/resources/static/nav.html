@@ -1,0 +1,68 @@
+<script>
+    // 控制图标变化
+
+    $("#nav a").click(function () {
+        if ($(this).next("ul").length != 0) {
+            // 判断有无兄弟ul结点
+            $(this)
+                .children("i")
+                .toggle2classes(
+                    "icofont-simple-right nav_right",
+                    "icofont-simple-down nav_right"
+                );
+            $(this)
+                .parent("li")
+                .children("ul")
+                .toggle();
+        }
+    });
+    // console.log(getCookie("role"))
+    // if(getCookie("role") == "车辆管理员"){
+    //     $("#test").remove()
+    // }
+    console.log(getCookie("role"))
+    if(getCookie("role") == "普通员工"){
+        $("#_info_pai").remove()
+        $("#test").remove()
+    }else if(getCookie("role") == "车辆管理员"){
+        $("#test").remove()
+    }
+</script>
+<div class="sider-nav">
+    <ul id="nav">
+        <li class="nav-ch-1">
+            <a><span class="icofont-home"></span> 主页 <i class="icofont-simple-right nav_right"></i></a>
+            <ul class="sub-menu">
+                <li>
+                    <a href="/"><i class="icofont-simple-right"></i> 控制面板</a>
+                </li>
+            </ul>
+        </li>
+        <li class="nav-ch-1">
+            <a><span class="icofont-car-alt-4"></span> 车辆管理 <i class="icofont-simple-right nav_right"></i></a>
+            <ul class="sub-menu">
+                <li id="_info_app">
+                    <a href="/apply.html"><i class="icofont-simple-right"></i> 车辆申请</a>
+                </li>
+                <li id="_info_man">
+                    <a href="/carInfo.html"><i class="icofont-simple-right"></i> 车辆信息管理</a>
+                </li>
+                <li id="_info_pai">
+                    <a href="/vehicle_dispatch.html"><i class="icofont-simple-right"></i> 车辆派用管理</a>
+                </li>
+                
+            </ul>
+        </li>
+        <li class="nav-ch-1" id="test">
+            <a><span class="icofont-user-alt-2"></span> 管理员管理 <i class="icofont-simple-right nav_right"></i></a>
+            <ul class="sub-menu">
+               <li><a href="user_manage.html"><i class="icofont-simple-right"></i> 用户管理</a></li>
+            </ul>
+        </li>
+        <!-- <li class="nav-ch-1">
+            <a><span class="icofont-pie-chart"></span> 系统管理 <i class="icofont-simple-right nav_right"></i></a>
+            <ul class="sub-menu">
+            </ul>
+        </li> -->
+    </ul>
+</div>

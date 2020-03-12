@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title>index</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--图标-->
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+
+    <!--布局框架-->
+    <link rel="stylesheet" type="text/css" href="css/util.css">
+
+    <!--主要样式-->
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <!-- 防止冲突样式 -->
+    <link rel="stylesheet" type="text/css" href="css/j_custom.css">
+
+    <link href="css/icofont.min.css" rel="stylesheet">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/include.js"></script>
+
+</head>
+
+<body>
+<div class="container" id="header"></div>
+
+<div class="left-nav" id="nav"></div>
+
+<div class="page-content">
+    <blockquote class="layui-elem-quote">欢迎<span id="this_role"></span>：
+        <span class="x-red" id="this_username"></span>！<span id="time"></span>
+    </blockquote>
+    <h1>申请车辆 </h1>
+    <div class="carInfo-block">
+        <span class="apply-btn"><i class="icofont-cab"></i> 车辆申请</span>
+    </div>
+    <div class="car-apply-list">
+        <table id="tab">
+            <tr>
+                <td>id</td>
+                <td>车辆编号</td>
+                <td>出车时间</td>
+                <td>还车时间</td>
+                <td>紧急程度</td>
+                <td>用车事由</td>
+                <td>实际出车时间</td>
+                <td>实际还车时间</td>
+                <td>是否超时未还</td>
+                <td>用户名</td>
+                <td>用车人</td>
+                <td>状态</td>
+            </tr>
+
+        </table>
+        <!--<div class="text-center" id="nodata"> 暂时没有车辆申请单 </div>-->
+    </div>
+</div>
+<!-- 对话框 -->
+<div class="popver-box">
+    <div class="popver-box-head">
+        <span class="popver-box-title"></span>
+        <i id="popver-box-close" class="icofont-close popver-box-close" style="float: right;padding: 4px;"></i>
+    </div>
+    <div class="popver-box-body">
+        <div class="popver-box-body-content"></div>
+        <div class="popver-box-body-btn"><span class="popver-box-close-yes" id="yes-btn"><i
+                class="icofont-check-alt"></i>确定</span><span class="popver-box-close"><i
+                class="icofont-close-line"></i>取消</span></div>
+    </div>
+</div>
+
+<script src="js/custom.js"></script>
+<script>
+    $(document).ready(function (){
+        $("#this_role").html(getCookie("role"))     // 更新欢迎语
+        $("#this_username").html(getCookie("username"))
+        var size = $("table tr").size() - 1
+        if(size == 1){
+            $("#get-apply-count").text(size)
+            alert("sadsd");
+            console.log("ok")
+        }
+        $.ajax({
+            type:'POST',
+            dataType: "json",   //返回格式为json
+            contentType: "application/json",
+            url:"http://localhost:10010/zccar/record/usearch",
+            data:JSON.stringify({}),
+            success: function(data){
+                showData(data.data);
+            }
+        })
+    })
+    function toStr(status) {
+        if(status == 1){
+            return "已处理"
+        }
+        else{
+            return "待审核"
+        }
+    }
+    //填充展示数据
+    function showData(data) {
+        var str = "";//定义用于拼接的字符串
+        for (var i = 0; i < data.length; i++) {
+            //拼接表格的行和列
+            str = "<tr><td>" + data[i].id + "</td><td>" + data[i].vehicleId + "</td><td>" + data[i].departDate + "</td><td>" + data[i].backDate + "</td><td>" + data[i].level + "</td><td>" + data[i].event + "</td><td>" + data[i].realDepartDate + "</td><td>" + data[i].realBackDate + "</td><td>未超时</td><td>" + data[i].username + "</td><td>" + data[i].name + "</td><td>" + toStr(parseInt(data[i].status1)) + "</td></tr>";
+            //追加到table中
+            $("#tab").append(str);
+        }
+    }
+    // 统计申请车辆总数
+    var size = $("table tr").size() - 1
+    var show_count = $("#get-apply-count").text(size)
+    if(size != 0){
+        $("#nodata").hide()
+    }
+
+    // 点击日期输入框 自动产生日期
+    function setDate(offset) {
+        var start = new Date();
+        start.setMonth(start.getMonth());
+        day = (start.getDate() + offset);
+        month = ("0" + (start.getMonth() + 1)).slice(-2);
+        today = start.getFullYear() + "-" + (month) + "-" + (day);
+        return today
+    }
+
+    // 点击车辆申请事件
+    $(".apply-btn").click(function () {
+        var html = '<div style="text-align:center">\
+            <ul style="text-align: right;display: inline-block;">\
+                <li>车辆编号 : </li>\
+                <li>出车时间 : </li>\
+                <li>还车时间 : </li>\
+                <li>紧急程度 : </li>\
+                <li>用车事由 : </li>\
+            </ul>\
+            <ul style="margin-left: 5px; display: inline-block;">\
+                <li><input class="width_180" id="num" ></li>\
+                <li><input class="width_180" type="datetime-local" id="departDate" ></li>\
+                <li><input class="width_180" type="datetime-local" id="backDate"></li>\
+                <li><select class="width_180" id="level"><option>低</option><option>中</option><option>高</option></select></li>\
+                <li><input class="width_180" id="event"></li>\
+            </ul>\
+        </div>'
+
+        $(".popver-box-title").text("车辆申请")
+        $(".popver-box-body-content").html(html)
+        $(".popver-box").show()
+
+        $("#yes-btn").click(function () {
+            var num = $('#num').val();
+            var departTime = $("#departDate").val().split("T")[0] + " " + $("#departDate").val().split("T")[1];
+            var backTime = $("#backDate").val().split("T")[0] + " " + $("#backDate").val().split("T")[1];
+            var level = $('#level').val();
+            var event = $('#event').val();
+            $.ajax({
+                type: 'POST',
+                dataType: "json",   //返回格式为json
+                contentType: "application/json",
+                url: "http://localhost:10010/zccar/record/application",
+                data: JSON.stringify({
+                    record: {
+                        vehicleId: parseInt(num),
+                        departDate: departTime,
+                        backDate: backTime,
+                        level: level,
+                        event: event
+                    }
+                }),
+                success: function () {
+                    alert("申请成功!");
+                    window.location.href = "./apply.html";
+                },
+                error:function () {
+                   // window.location.href = "./apply.html";
+                }
+            })
+            window.location.href = "./apply.html";
+            $(this).unbind("click")
+            $(".popver-box").hide();
+        })
+    })
+
+
+    $(document).on('focus', '#event', function () {
+        $(this).val("因公需要")
+    })
+    $(document).on('focus', '#departDate', function () {
+        $(this).val(setDate(0))
+    })
+    $(document).on('focus', '#backDate', function () {
+        $(this).val(setDate(1))
+    })
+
+
+</script>
+</body>
+
+</html>

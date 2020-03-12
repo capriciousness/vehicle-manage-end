@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title>index</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--图标-->
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+
+    <!--布局框架-->
+    <link rel="stylesheet" type="text/css" href="css/util.css">
+
+    <!--主要样式-->
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <!-- 防止冲突样式 -->
+    <link rel="stylesheet" type="text/css" href="css/j_custom.css">
+
+    <link href="css/icofont.min.css" rel="stylesheet">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/include.js"></script>
+</head>
+
+<body>
+<div class="container" id="header"></div>
+
+<div class="left-nav" id="nav"></div>
+
+<div class="page-content">
+    <blockquote class="layui-elem-quote">欢迎<span id="this_role"></span>：
+        <span class="x-red" id="this_username"></span>！<span id="time"></span>
+    </blockquote>
+    <h1>用户管理</h1>
+    <div class="carInfo-block">
+        <span class="search-btn"><i class="icofont-search-user"></i>    查询</span>
+        <span class="goback_btn"><i class="icofont-reply" style="padding: 3px 0px;"></i> 返回</span>
+    </div>
+    <div class="user_table">
+        <table>
+            <tr>
+                <td>用户名</td>
+                <td>用户密码</td>
+                <td>用户姓名</td>
+                <td>电话号码</td>
+                <td>用户角色</td>
+                <td>操作</td>
+            </tr>
+        </table>
+    </div>
+    <div class="popver-box">
+        <div class="popver-box-head">
+            <span class="popver-box-title"></span>
+            <i id="popver-box-close" class="icofont-close popver-box-close" style="float: right;padding: 4px;"></i>
+        </div>
+        <div class="popver-box-body">
+            <div class="popver-box-body-content"></div>
+            <div class="popver-box-body-btn"><span class="popver-box-close-yes"><i
+                    class="icofont-check-alt"></i>确定</span><span class="popver-box-close"><i
+                    class="icofont-close-line"></i>取消</span></div>
+        </div>
+    </div>
+</div>
+
+<script src="js/custom.js"></script>
+<script>
+        var isWork = false  // 用于同步 限制操作
+        // 用户信息修改
+        $(document).on('click', ".Info-modify", function () {
+            if (isWork) {     // 同步
+                return
+            }
+            isWork = true
+            var tr = $(this).parents("tr")
+            // console.log($(tr).children("td.user_id").text())
+            var account = $(tr).children("td.user_account").text()
+            var pass = $(tr).children("td.user_pass").text()
+            var name = $(tr).children("td.user_name").text()
+            var tel = $(tr).children("td.user_tel").text()
+            var html = '<div style="text-align:center;">\
+                <ul style="display: inline-block;text-align: right;">\
+                    <li>用户名:</li>\
+                    <li>用户密码:</li>\
+                    <li>用户姓名:</li>\
+                    <li>电话号码:</li>\
+                    <li>用户角色:</li>\
+                </ul>\
+                <ul style="display: inline-block;">\
+                    <li><input id="account" placeholder="请输入用户名" class="width_180" value='+ account + '></li>\
+                    <li><input id="pass" placeholder="请输入用户密码" class="width_180" value='+ pass + '><i class="icofont-eye-blocked just_pos_eye"></i></li>\
+                    <li><input id="_name" placeholder="请输入用户姓名" class="width_180" readonly="readonly" value='+ name + '></li>\
+                    <li><input id="tel" placeholder="请输入电话" class="width_180" value='+ tel + '></li>\
+                    <li><select id="sel" class="width_180"><option>普通员工</option><option>车辆管理员</option><option>系统管理员</option></select></li>\
+                </ul>\
+            </div>'
+
+            $(".popver-box-title").text("用户信息修改")     // 设置标题
+            $(".popver-box-body-content").html(html)
+            $(".popver-box").show()     // 显示对话框
+            // 处理确定按钮事件，将数据写回表格，提交到后台
+            $(".popver-box-close-yes").click(function () {
+                // 获取修改后的值
+                account = $("#account").val()
+                pass = $("#pass").val()
+                name = $("#_name").val()
+                tel = $("#tel").val()
+                role = $("#sel option:selected").text()
+
+                console.log(account, pass, name, tel, role)
+                $(".popver-box-body-content").html("Waitting for server.")
+                // TODO AJAX here
+                var parm = {"user":{"username":account,"password":pass,"name":name,"phone":tel,"role":role}}
+                $.ajax({
+                    method:"post",
+                    dataType: "json",
+                    contentType: "application/json",
+                    url: "http://localhost:10010/zccar/userbase/update",
+                    data: JSON.stringify(parm),
+                    success: function (result) {
+                        // 写回表格
+                        console.log("修改用户信息成功")
+                    },
+                    error: function(){
+                        console.log("修改用户信息失败")
+
+                    }
+                })
+                $(tr).children("td.user_account").html(account)
+                $(tr).children("td.user_pass").html(pass)
+                $(tr).children("td.user_name").html(name)
+                $(tr).children("td.user_tel").html(tel)
+                $(tr).children("td.user_role").html(role)
+                $(".popver-box").hide()     // 隐藏对话框
+                isWork = false
+                $(this).unbind('click')     // 解除事件绑定
+            })
+            // 处理取消事件
+            $(".popver-box-close").click(function () {
+                $(".popver-box").hide()
+                $(".popver-box-close-yes").unbind("click")
+                isWork = false
+            })
+
+        })
+
+
+        // 查询
+        $(".search-btn").click(function(){
+            if(isWork){
+                return
+            }
+            isWork = true
+            $(".popver-box-title").text("搜索")
+            $(".popver-box-body-content").html('<div class="text-center"><span>请输入用户名：</span><input class="width_180" id="search_input"></div>')
+           // $(".popver-box-close-yes").html("<i class='icofont-check-alt'></i>搜索")
+            $(".popver-box").show()
+
+            // 搜索事件
+            $(".popver-box-close-yes").click(function(){
+
+                var input_name = $("#search_input").val()
+                console.log("search name : "+input_name)
+                $.ajax({
+                    method:"post",
+                    dataType:"json",
+                    contentType:"application/json",
+                    url: "http://localhost:10010/zccar/userbase/search",
+                    data: JSON.stringify({}),
+                    success: function(result){
+                        //  更新表格
+                        $("tr").remove(".do_not_del")
+                        var html = ''
+                        var flag = 0 // 判断有没有查到
+                        $.each(result.data, function(index, content){
+                            if(content.username == input_name){
+                                flag = 1
+                                html = '<tr class="do_not_del">\
+                                        <td class="user_account">'+content.username+'</td>\
+                                        <td class="user_pass">'+content.password+'</td>\
+                                        <td class="user_name">'+content.name+'</td>\
+                                        <td class="user_tel">'+content.phone+'</td>\
+                                        <td class="user_role">'+content.details+'</td>\
+                                        <td class="user_manage"><span class="Info-modify">修改</span></td>\
+                                    </tr>'
+                                $("table").append(html)
+                            }
+                        })
+                        if(!flag){
+                            $("table").append("没有查到")
+                        }
+                        isWork = false
+                    }
+                })
+
+                $(this).unbind("click")
+                $(".popver-box").hide()
+            })
+            // 取消事件
+            $(".popver-box-close").click(function(){
+                $(".popver-box-close-yes").unbind("click")
+                isWork = false
+            })
+
+        })
+
+        // 切换密码显示
+        $(document).on("click", ".just_pos_eye", function () {
+            $(this).toggle2classes("icofont-eye-blocked just_pos_eye", "icofont-eye just_pos_eye")
+        })
+
+        // 判空提示
+        $(document).on("blur", ".width_180", function () {
+            if ($(this).val() == "") {
+                $(this).css({ "box-shadow": "inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px red" })
+            } else {
+                $(this).css("box-shadow", "none")
+            }
+        })
+
+        // 打开页面更新表格数据
+        $(document).ready(function(){
+            $("#this_role").html(getCookie("role"))
+            $("#this_username").html(getCookie("username"))
+
+            var parm = {}
+            $.ajax({
+                    method: "post",
+                    dataType: "json",
+                    contentType: "application/json",
+                    url: "http://localhost:10010/zccar/userbase/search",
+                    data: JSON.stringify(parm),
+                    success: function (result) {
+                        var html = ""
+
+                        $.each(result.data, function(index, content){
+                            html = '<tr class="do_not_del">\
+                                        <td class="user_account">'+content.username+'</td>\
+                                        <td class="user_pass">'+content.password+'</td>\
+                                        <td class="user_name">'+content.name+'</td>\
+                                        <td class="user_tel">'+content.phone+'</td>\
+                                        <td class="user_role">'+content.details+'</td>\
+                                        <td class="user_manage"><span class="Info-modify">修改</span></td>\
+                                    </tr>'
+                            $("table").append(html)
+                        })
+                        console.log(result)
+                    },
+                    error:function(){
+                        console.log("修改失败")
+                    }
+                })
+        })
+
+        $(".goback_btn").click(function(){
+            window.location.href="/user_manage.html";
+        })
+    </script>
+</body>
+
+</html>

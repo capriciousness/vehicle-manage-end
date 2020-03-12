@@ -1,0 +1,26 @@
+<script>
+    $(".user").click(function () {
+        $(this)
+            .children("i")
+            .toggle2classes("icofont-caret-down", "icofont-caret-up");
+        $(this)
+            .next()
+            .toggle();
+    });
+    // 点击退出
+    $(".logout").click(function () {
+        //  用户退出 清除 cookie session
+        clearCookie("username")
+        clearCookie("role")
+        window.location.href = "/login.html";
+    });
+    $(document).ready(function(){
+        $("#name").text(getCookie("username"))
+    })
+</script>
+<a>中创办公车辆管理后台</a>
+<span class="user"><span id="name"></span> <i class="icofont-caret-down"></i></span>
+<div class="user-child">
+    <span class="logout">切换账号</span>
+    <span class="logout">退出</span>
+</div>

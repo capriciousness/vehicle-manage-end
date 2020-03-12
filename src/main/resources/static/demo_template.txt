@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title>index</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--图标-->
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+
+    <!--布局框架-->
+    <link rel="stylesheet" type="text/css" href="css/util.css">
+
+    <!--主要样式-->
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <!-- 防止冲突样式 -->
+    <link rel="stylesheet" type="text/css" href="css/j_custom.css">
+
+    <link href="css/icofont.min.css" rel="stylesheet">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/include.js"></script>
+</head>
+
+<body>
+    <div class="container" id="header"></div>
+
+    <div class="left-nav" id="nav"></div>
+
+    <div class="page-content">
+        <blockquote class="layui-elem-quote">欢迎管理员：
+            <span class="x-red">admin</span>！<span id="time"></span>
+        </blockquote>
+        <!-- code here -->
+    </div>
+
+    <script src="js/custom.js"></script>
+</body>
+
+</html>

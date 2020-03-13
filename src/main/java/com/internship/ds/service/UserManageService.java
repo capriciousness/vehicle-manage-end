@@ -52,7 +52,7 @@ public class UserManageService {
 
     public JSONObject roleManagedel(String request){
         val p = Objects.requireNonNull(JSON.parseObject(request));
-        String  det = Objects.requireNonNull(p.getString("detail"));
+        String  det = Objects.requireNonNull(p.getString("details"));
         userManageDao.delRole(det);
         return null;
     }
@@ -61,7 +61,7 @@ public class UserManageService {
 
     public JSONObject powerManageAdd(String request){
         val p = Objects.requireNonNull(JSON.parseObject(request));
-        String name = Objects.requireNonNull(p.getString("detail"));
+        String name = Objects.requireNonNull(p.getString("details"));
         String ps = p.getString("ps");
         userManageDao.addPower(name,ps);
         return  null;

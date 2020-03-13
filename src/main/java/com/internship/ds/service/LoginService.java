@@ -35,7 +35,7 @@ public class LoginService {
         }
         session.setAttribute("username",user.getUsername());
         // 根据查询用户所拥有的角色
-        Long id = userDao.findId(user.getUsername());
+        Integer id = userDao.findId(user.getUsername());
         String role = userDao.findId_Role(id);
         return new JSONObject().fluentPut("errorCode",0).fluentPut("error",null)
                 .fluentPut("data",new JSONObject().fluentPut("name",user.getName()).fluentPut("role",role));

@@ -111,7 +111,7 @@
                 console.log(account, pass, name, tel, role)
                 $(".popver-box-body-content").html("Waitting for server.")
                 // TODO AJAX here
-                var parm = {"user":{"username":account,"password":pass,"name":name,"phone":tel,"role":role}}
+                var parm = {"user":{"username":account,"password":pass,"name":name,"phone":tel,"details":role}}
                 $.ajax({
                     method:"post",
                     dataType: "json",

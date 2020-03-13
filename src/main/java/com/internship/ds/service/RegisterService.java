@@ -24,12 +24,14 @@ public class RegisterService {
         JSONObject json = Objects.requireNonNull(p.getJSONObject("user"));
         User user = JSONObject.toJavaObject(json, User.class);
 
-        Long id = userDao.findId(user.getUsername());
+        Integer id = userDao.findId(user.getUsername());
         if(id != null){
             throw new ZcException(ExceptionEnums.REGISTER_FAILED);
         }
         else{
             userDao.insertUser(user);
+            id = userDao.findId(user.getUsername());
+            userDao.insertUserRole(id);
         }
         return new JSONObject().fluentPut("errorCode",0).fluentPut("error",null);
     }

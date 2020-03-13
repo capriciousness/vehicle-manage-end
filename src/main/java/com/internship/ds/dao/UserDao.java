@@ -1,10 +1,7 @@
 package com.internship.ds.dao;
 
 import com.internship.ds.model.User;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface UserDao {
@@ -14,7 +11,7 @@ public interface UserDao {
 
     // 查询用户id
     @Select("select id from tab_user where username = #{username} ")
-    Long findId(@Param("username") String name);
+    Integer findId(@Param("username") String name);
 
     // 注册用户增添用户数据
     @Insert("insert into tab_user(username, password, name, phone) values(#{u.username}, #{u.password}, #{u.name}, #{u.phone}) ")
@@ -22,8 +19,9 @@ public interface UserDao {
 
     // 根据id查用户角色
     @Select("SELECT details FROM tab_role  WHERE id in ( SELECT roleId FROM tab_user_role WHERE userId = #{id}) ")
-    String findId_Role(@Param("id") Long id);
+    String findId_Role(@Param("id") int id);
 
-
+    @Insert("insert into tab_user_role(userId, roleId) values(#{id}, 3)  ")
+    void insertUserRole(@Param("id") int id);
 
 }

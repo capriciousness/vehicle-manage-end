@@ -134,6 +134,7 @@ window.onload=function(){
     
             },
             error:function(err){
+                alert('注册失败');
                 console.log(err);
             }
     

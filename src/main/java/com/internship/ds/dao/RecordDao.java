@@ -1,6 +1,7 @@
 package com.internship.ds.dao;
 
 import com.internship.ds.model.Record;
+import com.internship.ds.model.VericleInfo;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -33,4 +34,6 @@ public interface RecordDao {
 
     @Select("select name from tab_user where username = #{username} ")
     String findName(@Param("username") String username);
+
+
 }

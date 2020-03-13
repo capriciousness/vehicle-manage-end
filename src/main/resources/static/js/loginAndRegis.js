@@ -129,7 +129,8 @@ window.onload=function(){
                     window.location.href="./login.html";
                 }
                 else{
-                    alert(data.error);
+                    alert('注册失败');
+                    //alert(data.error);
                 }
     
             },

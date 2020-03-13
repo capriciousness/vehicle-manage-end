@@ -53,7 +53,7 @@ window.onload=function(){
                             else{
                                 str+="<td>已处理</td>"
                             }
-                            str+="<td>"+'<button class="manage-allow" >处理</button>'+"</td>";
+                            str+="<td>禁止操作</td>";
                             str+="</tr>";
                         }
                         $("#vehicleTable").append(str);

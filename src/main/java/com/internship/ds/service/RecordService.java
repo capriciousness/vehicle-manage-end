@@ -82,4 +82,8 @@ public class RecordService {
         recordDao.updateVehicle(record.getVehicleId());
 
     }
+
+
+
+
 }
